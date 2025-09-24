@@ -7,11 +7,9 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   
-  // 상품 데이터에서 가격 정보 가져오기
-  const price = product.price || 50000;
-  const discount = product.discount || 0;
-  const finalPrice = discount > 0 ? Math.floor(price * (1 - discount / 100)) : price;
+  // 가격 정보 제거됨
 
   const handleCardClick = () => {
     if (onProductClick) {
@@ -22,6 +20,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick }) =>
   const handleLikeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsLiked(!isLiked);
+  };
+
+  const handleExpandClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
   };
 
   return (
@@ -85,27 +88,52 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick }) =>
           ))}
         </div>
 
-        {/* 하단 가격 영역 */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <div className="flex items-center gap-1.5">
-            {discount > 0 && (
-              <span className="text-xs text-gray-400 line-through">
-                ₩{price.toLocaleString()}
+        {/* 예약 링크 아코디언 */}
+        {product.externalUrls && product.externalUrls.length > 0 && (
+          <div className="border-t border-gray-100 pt-3">
+            <button
+              onClick={handleExpandClick}
+              className="flex items-center justify-between w-full text-left text-xs text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <span className="font-medium">
+                예약 링크 {product.externalUrls.length}개
               </span>
+              <svg
+                className={`h-3 w-3 transition-transform duration-200 ${
+                  isExpanded ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            
+            {isExpanded && (
+              <div className="mt-2 space-y-1">
+                {product.externalUrls.map((url: string, idx: number) => {
+                  // URL 인덱스에 따른 예약 사이트 이름 매핑
+                  const siteNames = ["KKday", "Klook", "Trip.com", "GetYourGuide"];
+                  const siteName = siteNames[idx] || `예약 링크 ${idx + 1}`;
+                  
+                  return (
+                    <a
+                      key={idx}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-xs text-gray-600 hover:text-blue-600 py-1 px-2 bg-gray-50 rounded hover:bg-blue-50 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {siteName}
+                    </a>
+                  );
+                })}
+              </div>
             )}
-            <span className="text-lg font-bold text-blue-600">
-              ₩{finalPrice.toLocaleString()}
-            </span>
           </div>
-          <div className="flex items-center gap-2">
-            {discount > 0 && (
-              <span className="text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">
-                {discount}% 할인
-              </span>
-            )}
-            <span className="text-xs text-gray-500">1인당</span>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -44,11 +44,8 @@ export default function Home() {
         case "popular":
           return b.views - a.views;
         case "latest":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case "price-low":
-          return a.price - b.price;
-        case "price-high":
-          return b.price - a.price;
+          // ID 순서로 정렬 (최신 등록 순)
+          return parseInt(b.id.split('_')[1]) - parseInt(a.id.split('_')[1]);
         default:
           return 0;
       }
@@ -78,10 +75,10 @@ export default function Home() {
       <div className="max-w-screen-md mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* 헤더 */}
         <div className="text-center mb-6">
-          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2">
-            투어 스트림
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2" style={{ fontFamily: 'Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+            TourStream
           </h1>
-          <p className="text-gray-600 text-base">
+          <p className="text-gray-600 text-sm">
             최고의 투어 상품을 찾아보세요
           </p>
         </div>
