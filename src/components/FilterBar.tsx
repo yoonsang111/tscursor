@@ -13,8 +13,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
   onLocationChange,
   onCategoryChange,
 }) => {
-  const locations = ["전체", "서울", "부산", "제주도", "강원도"];
-  const categories = ["전체", "해양스포츠", "도심체험", "겨울스포츠", "육상스포츠"];
+  const locations = ["전체", "오사카", "미국", "파리", "도쿄"];
+  const categories = ["전체", "입장권", "투어", "포토스팟", "전망대", "패스"];
 
   return (
     <div className="mb-4">
