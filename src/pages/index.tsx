@@ -117,9 +117,6 @@ export default function Home() {
           <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mb-2" style={{ fontFamily: 'Poppins, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
             TourStream
           </h1>
-          <p className="text-gray-600 text-sm">
-            최고의 투어 상품을 찾아보세요
-          </p>
         </div>
 
             {/* 검색바 */}
