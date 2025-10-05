@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 
 interface ProductCardProps {
   product: any;
@@ -27,11 +27,48 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick }) =>
     setIsExpanded(!isExpanded);
   };
 
+  // 구조화된 데이터 생성
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "description": product.description,
+    "category": product.categories.join(", "),
+    "brand": {
+      "@type": "Brand",
+      "name": "TourStream"
+    },
+    "offers": {
+      "@type": "Offer",
+      "availability": product.isAvailable ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "TourStream"
+      }
+    },
+    "locationCreated": {
+      "@type": "Place",
+      "name": product.locations.join(", "),
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "KR"
+      }
+    },
+    "keywords": product.tags.join(", ")
+  };
+
   return (
-    <div 
-      className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden cursor-pointer group"
-      onClick={handleCardClick}
-    >
+    <>
+      {/* 구조화된 데이터 */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      
+      <div
+        className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden cursor-pointer group"
+        onClick={handleCardClick}
+      >
       <div className="p-4">
         {/* 상단 헤더 */}
         <div className="flex items-start justify-between mb-3">
@@ -136,7 +173,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onProductClick }) =>
         )}
       </div>
     </div>
+    </>
   );
 };
 
-export default ProductCard; 
+export default memo(ProductCard); 

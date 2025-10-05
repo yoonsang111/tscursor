@@ -7,13 +7,26 @@ import SortSelector from "../components/SortSelector";
 import PartnerWidget from "../components/PartnerWidget";
 import Footer from "../components/Footer";
 
+// Google Analytics 이벤트 추적 함수
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
+const trackEvent = (eventName: string, parameters?: any) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', eventName, parameters);
+  }
+};
+
 export default function Home() {
   const [keyword, setKeyword] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("전체");
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [sortBy, setSortBy] = useState("popular");
 
-  // 필터링된 상품들
+  // 필터링된 상품들 - 성능 최적화
   const filteredProducts = useMemo(() => {
     let filtered = mockProducts.filter((product) => {
       // 검색어 필터
@@ -38,7 +51,7 @@ export default function Home() {
       return keywordMatch && locationMatch && categoryMatch;
     });
 
-    // 정렬
+    // 정렬 - 성능 최적화된 정렬
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "popular":
@@ -65,9 +78,35 @@ export default function Home() {
   }, [filteredProducts]);
 
   const handleProductClick = (productId: string) => {
+    // Google Analytics 이벤트 추적
+    trackEvent('product_click', {
+      product_id: productId,
+      event_category: 'engagement',
+      event_label: 'product_card_click'
+    });
+    
     // 실제로는 라우터를 사용하여 상품 상세 페이지로 이동
     console.log(`상품 ${productId} 클릭됨`);
     // window.location.href = `/product/${productId}`;
+  };
+
+  const handleSearch = (searchTerm: string) => {
+    if (searchTerm.trim()) {
+      trackEvent('search', {
+        search_term: searchTerm,
+        event_category: 'search',
+        event_label: 'keyword_search'
+      });
+    }
+  };
+
+  const handleFilterChange = (filterType: string, filterValue: string) => {
+    trackEvent('filter_change', {
+      filter_type: filterType,
+      filter_value: filterValue,
+      event_category: 'engagement',
+      event_label: 'filter_interaction'
+    });
   };
 
   return (
@@ -83,18 +122,30 @@ export default function Home() {
           </p>
         </div>
 
-        {/* 검색바 */}
-        <div className="mb-4">
-          <SearchBar value={keyword} onChange={setKeyword} />
-        </div>
+            {/* 검색바 */}
+            <div className="mb-4">
+              <SearchBar 
+                value={keyword} 
+                onChange={(value) => {
+                  setKeyword(value);
+                  handleSearch(value);
+                }} 
+              />
+            </div>
 
         {/* 필터 및 정렬 */}
         <div className="mb-4">
           <FilterBar
             selectedLocation={selectedLocation}
             selectedCategory={selectedCategory}
-            onLocationChange={setSelectedLocation}
-            onCategoryChange={setSelectedCategory}
+            onLocationChange={(location) => {
+              setSelectedLocation(location);
+              handleFilterChange('location', location);
+            }}
+            onCategoryChange={(category) => {
+              setSelectedCategory(category);
+              handleFilterChange('category', category);
+            }}
           />
           <SortSelector sortBy={sortBy} onSortChange={setSortBy} />
         </div>
